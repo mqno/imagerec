@@ -9,6 +9,7 @@ function Camera() {
   const [isCameraActive, setIsCameraActive] = useState(null);
   const [error, setError] = useState(null);
 
+let currentFacingMode = 'environment'; // 'user' for front camera, 'environment' for back camera
 
   useEffect(() => {
     if (videoRef.current.srcObject && !isCameraActive) {
@@ -18,18 +19,25 @@ function Camera() {
   } 
   , [videoRef?.current?.srcObject]);
 
-  const startCamera = () => {
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(function(stream) {
-        if (videoRef.current) {
-          setIsCameraActive(true);
-          videoRef.current.srcObject = stream;
-        }
-      })
-      .catch(function(err) {
-        console.error(err);
-      });
-  };
+const startCamera = (facingMode = 'environment') => {
+  navigator.mediaDevices.getUserMedia({ 
+    video: { facingMode } 
+  })
+    .then(function(stream) {
+      if (videoRef.current) {
+        setIsCameraActive(true);
+        videoRef.current.srcObject = stream;
+        currentFacingMode = facingMode;
+      }
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
+};
+const switchCamera = () => {
+  const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+  startCamera(newFacingMode);
+};
 
 const takePhoto = () => {
   const canvas = document.createElement('canvas');
@@ -77,18 +85,21 @@ const takePhoto = () => {
       
       <div className='flex gap-2 justify-center items-center flex-wrap'>
         <button className='btn btn-primary' onClick={startCamera}>Start Camera</button>  
-        <button className='btn btn-secondary' onClick={takePhoto} disabled={!isCameraActive}>
+        <button className='btn btn-secondary' onClick={takePhoto} disabled={!isCameraActive || loading}>
           {loading ? <span className='flex justify-center items-center gap-2'><LoadingSpinner size="sm" />  <p>Processing</p>  </span>: 'Take Photo'}
         </button>
-        <button className='btn btn-accent' onClick={searchImage} disabled={!isCameraActive}>
+        <button className='btn btn-accent' onClick={searchImage} disabled={!isCameraActive || loading}>
              {loading ? <span className='flex justify-center items-center gap-2'><LoadingSpinner size="sm" />  <p>Processing</p>  </span>: 'Search Image'}
+        </button>
+        <button className='btn btn-warning' onClick={switchCamera} disabled={!isCameraActive || loading}>
+             ⟳ switch camera
         </button>
       </div>
       {result && <div>
         <h1 className="text-4xl font-bold text-center">Result</h1>
-        <p className="text-lg text-center">{result?.data?.product_name}</p>
-        <p className="text-lg text-center">{result?.data?.product_category}</p>
-        <p className="text-lg text-center">{result?.data?.product_model}</p>
+        <p className="text-lg text-center">name : {result?.data?.product_name}</p>
+        <p className="text-lg text-center">category : {result?.data?.product_category}</p>
+        <p className="text-lg text-center">model : {result?.data?.product_model}</p>
       </div>}
       {error && <div>
         <h1 className="text-4xl font-bold text-center text-error">Error</h1>
