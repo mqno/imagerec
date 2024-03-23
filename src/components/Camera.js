@@ -58,14 +58,14 @@ const startCamera = (deviceId = devices[0]?.deviceId) => {
       console.error(err);
     });
 };
-
+/*
 const switchCamera = () => {
   const currentIndex = devices.findIndex(device => device.deviceId === currentDeviceId);
   const nextIndex = (currentIndex + 1) % devices.length;
   currentDeviceId = devices[nextIndex].deviceId;
   startCamera(currentDeviceId);
 };
-
+*/
 const takePhoto = () => {
   const canvas = document.createElement('canvas');
   const video = videoRef.current;
@@ -120,9 +120,10 @@ const takePhoto = () => {
         <button className='btn btn-accent' onClick={searchImage} disabled={(!isCameraActive || !takenPhoto) || loading}>
              {loading ? <span className='flex justify-center items-center gap-2'><LoadingSpinner size="sm" />  <p>Processing</p>  </span>: 'Search Image'}
         </button>
-        <button className='btn btn-warning' onClick={switchCamera} disabled={!isCameraActive || loading}>
-             ⟳ switch camera
+        {/*<button className='btn btn-warning' onClick={switchCamera} disabled={!isCameraActive || loading}>
+          ⟳ switch camera
         </button>
+        */}
       </div>
       <SelectComponent devices={devices} startCamera={startCamera} />
       {result && <div>
