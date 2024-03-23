@@ -9,7 +9,8 @@ function Camera() {
   const [isCameraActive, setIsCameraActive] = useState(null);
   const [error, setError] = useState(null);
 
-let currentFacingMode = 'environment'; // 'user' for front camera, 'environment' for back camera
+  let currentFacingMode = 'environment'; // 'user' for front camera, 'environment' for back camera
+  let currentStream = null;
 
   useEffect(() => {
     if (videoRef.current.srcObject && !isCameraActive) {
@@ -19,7 +20,11 @@ let currentFacingMode = 'environment'; // 'user' for front camera, 'environment'
   } 
   , [videoRef?.current?.srcObject]);
 
-const startCamera = (facingMode = { exact: "environment" }) => {
+  const startCamera = (facingMode = { exact: "environment" }) => {
+    // Stop the current stream if it exists
+  if (currentStream) {
+    currentStream.getTracks().forEach(track => track.stop());
+  }
   navigator.mediaDevices.getUserMedia({ 
     video: { facingMode } 
   })
@@ -28,6 +33,7 @@ const startCamera = (facingMode = { exact: "environment" }) => {
         setIsCameraActive(true);
         videoRef.current.srcObject = stream;
         currentFacingMode = facingMode;
+        currentStream = stream; // Store the current stream
       }
     })
     .catch(function(err) {
@@ -88,7 +94,7 @@ const takePhoto = () => {
         <button className='btn btn-secondary' onClick={takePhoto} disabled={!isCameraActive || loading}>
           {loading ? <span className='flex justify-center items-center gap-2'><LoadingSpinner size="sm" />  <p>Processing</p>  </span>: 'Take Photo'}
         </button>
-        <button className='btn btn-accent' onClick={searchImage} disabled={(!isCameraActive && !takenPhoto) || loading}>
+        <button className='btn btn-accent' onClick={searchImage} disabled={(!isCameraActive || !takenPhoto) || loading}>
              {loading ? <span className='flex justify-center items-center gap-2'><LoadingSpinner size="sm" />  <p>Processing</p>  </span>: 'Search Image'}
         </button>
         <button className='btn btn-warning' onClick={switchCamera} disabled={!isCameraActive || loading}>

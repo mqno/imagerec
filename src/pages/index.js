@@ -19,8 +19,10 @@ export default function Home() {
           </p>
           <p className="text-lg text-center">
             Click the "Start Camera" button to start the camera and the "Take
-            Photo" button to take a photo.
+            Photo" button to take a photo.Search Image button to search the image and get the result.
+            Switch camera button to switch the camera.
           </p>
+          <br/>
           <p className="text-lg text-center">
             The photo will be uploaded to the server and the server will use the
             Google Cloud Vertex AI API to recognize the objects in the image.
