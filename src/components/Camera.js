@@ -7,7 +7,10 @@ function Camera() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(null);
+  const [camLabel, setCamLabel] = useState('');
   const [error, setError] = useState(null);
+  const [devices, setDevices] = useState([]);
+  let currentDeviceId = '';
 
   let currentFacingMode = 'environment'; // 'user' for front camera, 'environment' for back camera
   let currentStream = null;
@@ -20,19 +23,37 @@ function Camera() {
   } 
   , [videoRef?.current?.srcObject]);
 
-  const startCamera = (facingMode = { exact: "environment" }) => {
-    // Stop the current stream if it exists
+
+useEffect(() => {
+  navigator.mediaDevices.enumerateDevices()
+    .then(function(devices) {
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      setDevices(videoDevices);
+      if (videoDevices[0]) {
+        currentDeviceId = videoDevices[0].deviceId;
+        startCamera(currentDeviceId);
+      }
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
+}, []);
+  
+console.log(devices);
+
+const startCamera = (deviceId = devices[0]?.deviceId) => {
+  // Stop the current stream if it exists
+  setCamLabel(devices.find(device => device.deviceId === deviceId).label);
   if (currentStream) {
     currentStream.getTracks().forEach(track => track.stop());
   }
   navigator.mediaDevices.getUserMedia({ 
-    video: { facingMode } 
+    video: { deviceId: { exact: deviceId } } 
   })
     .then(function(stream) {
       if (videoRef.current) {
         setIsCameraActive(true);
         videoRef.current.srcObject = stream;
-        currentFacingMode = facingMode;
         currentStream = stream; // Store the current stream
       }
     })
@@ -40,9 +61,12 @@ function Camera() {
       console.error(err);
     });
 };
+
 const switchCamera = () => {
-  const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
-  startCamera(newFacingMode);
+  const currentIndex = devices.findIndex(device => device.deviceId === currentDeviceId);
+  const nextIndex = (currentIndex + 1) % devices.length;
+  currentDeviceId = devices[nextIndex].deviceId;
+  startCamera(currentDeviceId);
 };
 
 const takePhoto = () => {
@@ -87,6 +111,7 @@ const takePhoto = () => {
 
   return (
     <div className='flex flex-col gap-4 justify-center items-center'>
+      <h1 className="text-4xl font-bold text-center">{ camLabel}</h1>
       <video className="artboard artboard-horizontal phone-1 bg-base-300" ref={videoRef} autoPlay />
       
       <div className='flex gap-2 justify-center items-center flex-wrap'>
