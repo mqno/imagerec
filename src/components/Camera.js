@@ -19,7 +19,7 @@ let currentFacingMode = 'environment'; // 'user' for front camera, 'environment'
   } 
   , [videoRef?.current?.srcObject]);
 
-const startCamera = (facingMode = 'environment') => {
+const startCamera = (facingMode = { exact: "environment" }) => {
   navigator.mediaDevices.getUserMedia({ 
     video: { facingMode } 
   })
@@ -88,7 +88,7 @@ const takePhoto = () => {
         <button className='btn btn-secondary' onClick={takePhoto} disabled={!isCameraActive || loading}>
           {loading ? <span className='flex justify-center items-center gap-2'><LoadingSpinner size="sm" />  <p>Processing</p>  </span>: 'Take Photo'}
         </button>
-        <button className='btn btn-accent' onClick={searchImage} disabled={!isCameraActive || loading}>
+        <button className='btn btn-accent' onClick={searchImage} disabled={(!isCameraActive && !takenPhoto) || loading}>
              {loading ? <span className='flex justify-center items-center gap-2'><LoadingSpinner size="sm" />  <p>Processing</p>  </span>: 'Search Image'}
         </button>
         <button className='btn btn-warning' onClick={switchCamera} disabled={!isCameraActive || loading}>
