@@ -12,7 +12,6 @@ function Camera() {
   const [devices, setDevices] = useState([]);
   let currentDeviceId = '';
 
-  let currentFacingMode = 'environment'; // 'user' for front camera, 'environment' for back camera
   let currentStream = null;
 
   useEffect(() => {
@@ -31,7 +30,6 @@ useEffect(() => {
       setDevices(videoDevices);
       if (videoDevices[0]) {
         currentDeviceId = videoDevices[0].deviceId;
-        startCamera(currentDeviceId);
       }
     })
     .catch(function(err) {
@@ -39,7 +37,6 @@ useEffect(() => {
     });
 }, []);
   
-console.log(devices);
 
 const startCamera = (deviceId = devices[0]?.deviceId) => {
   // Stop the current stream if it exists
@@ -111,11 +108,11 @@ const takePhoto = () => {
 
   return (
     <div className='flex flex-col gap-4 justify-center items-center'>
-      <h1 className="text-4xl font-bold text-center">{ camLabel}</h1>
+      <h1 className="text-4xl font-bold text-center">{camLabel}</h1>
       <video className="artboard artboard-horizontal phone-1 bg-base-300" ref={videoRef} autoPlay />
       
       <div className='flex gap-2 justify-center items-center flex-wrap'>
-        <button className='btn btn-primary' onClick={startCamera}>Start Camera</button>  
+        <button className='btn btn-primary' onClick={()=>startCamera(devices.filter(device => device.kind === 'videoinput')?.[0]?.deviceId)}>Start Camera</button>  
         <button className='btn btn-secondary' onClick={takePhoto} disabled={!isCameraActive || loading}>
           {loading ? <span className='flex justify-center items-center gap-2'><LoadingSpinner size="sm" />  <p>Processing</p>  </span>: 'Take Photo'}
         </button>
