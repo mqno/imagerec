@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import LoadingSpinner from './LoadingSpinner';
+import {Button, Label, ListBox, ListBoxItem, Popover, Select, SelectValue} from 'react-aria-components';
 
 function Camera() {
   const videoRef = useRef(null);
@@ -123,6 +124,19 @@ const takePhoto = () => {
              ⟳ switch camera
         </button>
       </div>
+        <Select className='flex flex-col gap-4 justify-center items-center'>
+          <Label>Pick a camera</Label>
+          <Button className="menu bg-secondary rounded-box">
+            <SelectValue />
+          </Button>
+          <Popover>
+            <ListBox className="menu bg-secondary w-56 rounded-box">
+              {devices.map(device => (
+                <ListBoxItem key={device.deviceId} onClick={() => startCamera(device.deviceId)}>{device.label}</ListBoxItem>
+              ))}
+            </ListBox>
+          </Popover>
+        </Select>
       {result && <div>
         <h1 className="text-4xl font-bold text-center">Result</h1>
         <p className="text-lg text-center">name : {result?.data?.product_name}</p>
