@@ -24,17 +24,24 @@ function Camera() {
 
 
 useEffect(() => {
-  navigator.mediaDevices.enumerateDevices()
-    .then(function(devices) {
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      setDevices(videoDevices);
-      if (videoDevices[0]) {
-        currentDeviceId = videoDevices[0].deviceId;
-      }
-    })
-    .catch(function(err) {
-      console.error(err);
-    });
+  const setAllDevices = () => {
+    navigator.mediaDevices.enumerateDevices()
+      .then(function(devices) {
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        setDevices(videoDevices);
+        if (videoDevices[0]) {
+          currentDeviceId = videoDevices[0].deviceId;
+        }
+      })
+      .catch(function(err) {
+        console.error(err);
+      });
+  }
+  if(navigater){
+    setAllDevices();
+  } else {
+    setTimeout(() => setAllDevices(), 8000);
+  }
 }, []);
   
 
