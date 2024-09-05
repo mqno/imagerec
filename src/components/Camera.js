@@ -37,7 +37,7 @@ useEffect(() => {
         console.error(err);
       });
   }
-  if(navigater){
+  if(navigator){
     setAllDevices();
   } else {
     setTimeout(() => setAllDevices(), 8000);
