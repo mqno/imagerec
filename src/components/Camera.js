@@ -25,7 +25,7 @@ function Camera() {
 
 useEffect(() => {
   const setAllDevices = () => {
-    navigator.mediaDevices.enumerateDevices()
+    navigator?.mediaDevices?.enumerateDevices()
       .then(function(devices) {
         const videoDevices = devices.filter(device => device.kind === 'videoinput');
         setDevices(videoDevices);
@@ -51,7 +51,7 @@ const startCamera = (deviceId = devices[0]?.deviceId) => {
   if (currentStream) {
     currentStream.getTracks().forEach(track => track.stop());
   }
-  navigator.mediaDevices.getUserMedia({ 
+  navigator?.mediaDevices?.getUserMedia({ 
     video: { deviceId: { exact: deviceId } } 
   })
     .then(function(stream) {
