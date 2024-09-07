@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import Camera from "@/components/Camera";
-import WebcamVideo from "@/components/WebcamVideo";
 
 const inter = Inter({ subsets: ["latin"] });
 
