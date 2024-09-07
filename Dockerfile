@@ -16,12 +16,15 @@ FROM nginx:alpine AS runner
 WORKDIR /app
 
 # Install necessary packages
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash nodejs npm
 
 # Copy the built application from the builder stage
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/static ./.next/static
+
+# Copy only necessary Node.js dependencies
+COPY --from=builder /app/node_modules ./node_modules
 
 # Copy SSL certificates
 COPY ssl/nginx.crt /etc/nginx/ssl/nginx.crt
