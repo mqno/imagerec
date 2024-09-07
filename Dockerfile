@@ -15,21 +15,28 @@ RUN npm run build
 FROM nginx:alpine AS runner
 WORKDIR /app
 
+# Install necessary packages
+RUN apk add --no-cache bash
+
 # Copy the built application from the builder stage
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/static ./.next/static
 
-# Copy Nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY default.conf /etc/nginx/conf.d/default.conf
-
 # Copy SSL certificates
 COPY ssl/nginx.crt /etc/nginx/ssl/nginx.crt
 COPY ssl/nginx.key /etc/nginx/ssl/nginx.key
 
+# Copy Nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+# Copy custom entrypoint script
+COPY deploy/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 # Expose the port the app runs on
 EXPOSE 443
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the custom entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
