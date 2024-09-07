@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import Camera from "@/components/Camera";
+import WebcamVideo from "@/components/WebcamVideo";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,6 +12,8 @@ export default function Home() {
     >
       <div className="flex flex-col gap-5 z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
         <Camera />
+
+
         <div>
           <h1 className="text-4xl font-bold text-center">Image Recognition</h1>
           <p className="text-lg text-center">

@@ -23,27 +23,38 @@ function Camera() {
   , [videoRef?.current?.srcObject]);
 
 
-useEffect(() => {
-  const setAllDevices = () => {
-    navigator?.mediaDevices?.enumerateDevices()
-      .then(function(devices) {
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
-        setDevices(videoDevices);
-        if (videoDevices[0]) {
-          currentDeviceId = videoDevices[0].deviceId;
-        }
-      })
-      .catch(function(err) {
-        console.error(err);
-      });
-  }
-  if(navigator){
-    setAllDevices();
-  } else {
-    setTimeout(() => setAllDevices(), 8000);
-  }
+  useEffect(() => {
+    let mounted = true;
+    const setAllDevices = async () => {
+      try {
+        await navigator.mediaDevices.getUserMedia({ video:{ facingMode: 'back' }, audio: false });
+      } catch (error) {
+        console.error('Error getting user media:', error);
+      }
+      navigator?.mediaDevices?.enumerateDevices()
+        .then(async function (devices) {
+          const videoDevices = devices.filter(device => device.kind === 'videoinput');
+          setDevices(videoDevices);
+          if (videoDevices[0]) {
+            currentDeviceId = videoDevices[0].deviceId;
+          }
+        })
+        .catch(function(err) {
+          console.error('Error enumerating devices:', err);
+        });
+    }
+    if(mounted) {
+      if (navigator && navigator.mediaDevices) {
+        setAllDevices();
+      } else {
+        console.warn('Navigator or mediaDevices not available, retrying...');
+        setTimeout(() => setAllDevices(), 8000);
+      }
+    }
+    return () => {
+      mounted = false
+    }
 }, []);
-  
 
 const startCamera = (deviceId = devices[0]?.deviceId) => {
   // Stop the current stream if it exists
@@ -62,17 +73,10 @@ const startCamera = (deviceId = devices[0]?.deviceId) => {
       }
     })
     .catch(function(err) {
-      console.error(err);
+      console.error('Error starting camera:', err);
     });
-};
-/*
-const switchCamera = () => {
-  const currentIndex = devices.findIndex(device => device.deviceId === currentDeviceId);
-  const nextIndex = (currentIndex + 1) % devices.length;
-  currentDeviceId = devices[nextIndex].deviceId;
-  startCamera(currentDeviceId);
-};
-*/
+}
+
 const takePhoto = () => {
   const canvas = document.createElement('canvas');
   const video = videoRef.current;
