@@ -8,7 +8,7 @@ const {
 } = require("@google/generative-ai");
 
 
-const MODEL_NAME = "gemini-1.0-pro-vision-latest";
+const MODEL_NAME = process.env.AI_MODEL;
 const API_KEY = process.env.AI_STUDIO_API_KEY;
 
 export default async function handler(req, res) {
