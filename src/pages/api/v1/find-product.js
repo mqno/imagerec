@@ -15,8 +15,6 @@ export default async function handler(req, res) {
 
   async function run() {
     const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-
     const generationConfig = {
       temperature: 0.4,
       topK: 32,
@@ -42,26 +40,20 @@ export default async function handler(req, res) {
         threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
       },
     ];
+    const model = genAI.getGenerativeModel({ model: MODEL_NAME, generationConfig, safetySettings });
+
     const base64Image = req.body.image.split(';base64,').pop();
 
-    const parts = [
-      { text: "input: " },
+    const content = [
+      "tell me the product is in that image in the following json format if you cant identify just say 'unable to identify'; {  product_name:\"\",  product_category:\"\",  product_model:\"\"}",
       {
         inlineData: {
           mimeType: "image/jpeg",
           data: base64Image
         }
       },
-      {text: "output: "},
-      {text: "tell me the product is in that image in the following json format if you cant identify just say 'unable to identify'; {  product_name:\"\",  product_category:\"\",  product_model:\"\"}"},
-      {text: "output: "},
-    ];
-
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts }],
-      generationConfig,
-      safetySettings,
-    });
+    ]
+    const result = await model.generateContent(content);
 
     const response = result.response.text();
     return response;
